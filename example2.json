@@ -1,0 +1,9 @@
+{
+  "app_name": "Traffic proxy for Time Capsule",
+  "container": "Docker",
+  "collaborators":
+    [
+    {"name": "Jane Doe", "age": 55, "permissions": ["write collaborators", "write code"]},
+    {"name": "John Doe", "age": 41, "permissions": ["read collaborators", "write code"]}
+  ]
+}

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "jason"
+version = "0.0.1"
+description = "Manipulate JSON similarly to jq"
+authors = ["Malthe Jørgensen <malthe.jorgensen@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+jason = 'jason.cli:entry'
