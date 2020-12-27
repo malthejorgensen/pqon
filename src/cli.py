@@ -2,6 +2,7 @@ import argparse
 from functools import partial
 import json
 import re
+import sys
 
 RE_IDENTIFIER = re.compile(r'^[a-z][a-z0-9_]+', re.IGNORECASE)
 RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
@@ -9,7 +10,7 @@ RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
 
 parser = argparse.ArgumentParser(description='A JSON-biased alternative to jq')
 parser.add_argument('command', help='The jason command to run on the JSON')
-parser.add_argument('filename', metavar='files', help='The files to transform')
+parser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
 
 def attr_access(identifier, obj):
     return obj[identifier]
@@ -19,8 +20,11 @@ def entry():
     script = args.command
     filename = args.filename
 
-    with open(filename) as f:
-        current_value = json.load(f)
+    if not sys.stdin.isatty():
+        current_value = json.load(sys.stdin)
+    elif filename:
+        with open(filename) as f:
+            current_value = json.load(f)
 
     # Parser
     array_op = False
