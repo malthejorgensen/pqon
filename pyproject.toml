@@ -6,9 +6,10 @@ authors = ["Malthe Jørgensen <malthe.jorgensen@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.6"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
