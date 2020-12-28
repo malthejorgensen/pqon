@@ -38,3 +38,9 @@ Alternative tools
 * fx
 * jp
 * jello
+
+Credits
+-------
+`example4.json` is a hand-written version of [https://en.wikipedia.org/wiki/List_of_physicists]
+which is licensed as Creative Commons Attribution-ShareAlike License. Errors may
+occur.
