@@ -8,9 +8,12 @@ RE_IDENTIFIER = re.compile(r'^[a-z][a-z0-9_]+', re.IGNORECASE)
 RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
 
 
+# fmt: off
 parser = argparse.ArgumentParser(description='A JSON-biased alternative to jq')
 parser.add_argument('command', help='The jason command to run on the JSON')
 parser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
+parser.add_argument('-U', '--unix', action='store_true', help='Output lists with one line per element and quotes removed around strings')
+# fmt: on
 
 def attr_access(identifier, obj):
     return obj[identifier]
@@ -19,6 +22,7 @@ def entry():
     args = parser.parse_args()
     script = args.command
     filename = args.filename
+    unix = args.unix
 
     if not sys.stdin.isatty():
         current_value = json.load(sys.stdin)
@@ -51,7 +55,11 @@ def entry():
             else:
                 current_value = command(current_value)
 
-    print(json.dumps(current_value))
+    if type(current_value) is list and unix:
+        for el in current_value:
+            print(el)
+    else:
+        print(json.dumps(current_value))
 
 
 if __name__ == '__main__':
