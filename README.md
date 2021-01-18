@@ -1,7 +1,35 @@
 jason
 =====
-For some reason I have never really been able to grok `jq`, whereas grokking
-regex was relatively straight-forward.
+jason is a more consistent version of jq. The full reasoning behind building an alternative to `jq`
+can be found in this blog post ([https://malthejorgensen.com/blog/<slug>]).
+It takes JSON as input and outputs that JSON.
+
+Examples
+--------
+```json
+# example.json
+[
+  { "name": "Jane Doe", "age": 55 },
+  { "name": "John Doe", "age": 41 }
+]
+```
+
+```bash
+> jason '[].name' example.json
+["Jane Doe", "John Doe"]
+
+> jq '.[].name' example.json
+"Jane Doe"
+"John Doe"
+```
+
+```bash
+> jason 'F(.age > 50).name' example.json
+[{ "name": "Jane Doe", "age": 55 }]
+
+> jq '.[]|select(.age > 50)' example.json
+{ "name": "Jane Doe", "age": 55 }
+```
 
 One of the things that has been tripping me up is that jq is command-line biased
 
@@ -11,36 +39,106 @@ Knowing when you're in JSON-land and when you're in command-line land is not
 easy to keep track of, and adds to the mental gymnastics required when writing a
 script.
 
+* Always-on approach to JSON (internal represenation is JSON-compatible, and output is always JSON)
+* Decent error messages
+
+jason is
+--------
+* Easier to reason about than `jq` (yes, this is subjective)
+
+jason is _not_
+--------------
+* Built for speed (uses the built-in `json`-library in Python)
+* Low on memory usage / streaming (parses and stores the full JSON in memory)
 
 
-```json
-[
-  { "name": 'Jane Doe", "age": 55 },
-  { "name": 'John Doe", "age": 41 }
-]
+
+
+
+
+Does this return the full `example2.json`, or just the collaborators with an age
+above 50?
+```bash
+> jason '.collaborators[]F(.age > 50)' example2.json
+# Prints only collaborator elements
+> jason 'F(.collaborators.age > 50)' example3.json
+# Prints whole top-level object
+```
+
+Replace strings
+```bash
+> jason '.collaborators[].name|R("Doe", "Johnson")' example2.json
 ```
 
 ```bash
-> jason '[].name'
-["Jane Doe", "John Doe"]
-
-> jq '.[].name'
-Jane Doe
-John Doe
+# Get the first country in all countries attributes
+> jason '[].countries[0]'
+# Get the value of the "countries"-attribute of the first element in the list
+> jason '([].countries)[0]' == jason '[0].countries'
 ```
 
 Alternative tools
 -----------------
 
 * jq
-* jshon
-* jtc
-* fx
-* jp
-* jello
+* [jshon](https://github.com/keenerd/jshon)
+* [jtc](https://github.com/ldn-softdev/jtc)
+* [fx](https://github.com/antonmedv/fx)
+* [jp]()
+* [jello](https://github.com/kellyjonbrazil/jello)
+
+Alternative ideas
+-----------------
+### Selector / transformer at command line
+jason takes three arguments
+
+```bash
+> jason <selector> <transformers> <file>
+```
+
+The selector is which part of the JSON structure you want to have output.
+The transformers are any changes you want to make to the JSON structure.
+
+For example:
+```bash
+people4 = [
+    {"name": "Jane Doe", "personal": {"children": [{'name': 'Jake', 'age': 12}]}},
+    {"name": "John Doe", "personal": {"children": [{'name': 'Justin', 'age': 14}, {'name': 'John', 'age': 11}, {'name': 'Jade', 'age': 16}]}},
+]
+> jason '[].personal.children[].age' '[].personal.children!F(. > 13)' <file>
+[[], [14, 16]]
+or this other syntax where the transform always works on the output of the selector
+> jason '[].personal.children[].age' 'F(. > 13)' <file>
+[[], [14, 16]]
+```
+
+### Selector / transformer clearly marked in the language
+
+jason generally has two kinds of operations:
+
+* Selectors -- always start with a `.`
+* Transformers -- always start with a `!`
+
+```bash
+people4 = [
+    {"name": "Jane Doe", "personal": {"children": [{'name': 'Jake', 'age': 12}]}},
+    {"name": "John Doe", "personal": {"children": [{'name': 'Justin', 'age': 14}, {'name': 'John', 'age': 11}, {'name': 'Jade', 'age': 16}]}},
+]
+> jason '.[].personal.children.[].age!F(. > 13)' <file>
+[[], [14, 16]]
+> jason '.[].personal.children!F(.age > 13)' <file>
+[[], [{'name': 'Justin', 'age': 14}, {'name': 'Jade', 'age': 16}]]
+# > jason '!F(.personal.children.[].age > 13)' <file>
+> jason '!F(.personal.children!any(.age > 13))' <file>
+[{"name": "John Doe", "personal": {"children": [{'name': 'Justin', 'age': 14}, {'name': 'John', 'age': 11}, {'name': 'Jade', 'age': 16}]}}]
+```
 
 Credits
 -------
 `example4.json` is a hand-written version of [https://en.wikipedia.org/wiki/List_of_physicists]
 which is licensed as Creative Commons Attribution-ShareAlike License. Errors may
 occur.
+
+Thank you
+---------
+* https://dev.to/bowmanjd/build-and-test-a-command-line-interface-with-poetry-python-s-argparse-and-pytest-4gab
