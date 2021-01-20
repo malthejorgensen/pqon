@@ -4,17 +4,19 @@ import json
 import re
 import sys
 
+from .parser import parser
+
 RE_IDENTIFIER = re.compile(r'^[a-z][a-z0-9_]+', re.IGNORECASE)
 RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
 
 
 # fmt: off
-parser = argparse.ArgumentParser(description='A JSON-biased alternative to jq')
-parser.add_argument('command', help='The jason command to run on the JSON')
-parser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
-parser.add_argument('--strict', action='store_true', help='Error on missing attributes')
-parser.add_argument('-U', '--unix', action='store_true', help='Output lists with one line per element and quotes removed around strings')
-parser.add_argument('-N', '--allow-nulls', action='store_true', help='Allow nulls in output')
+argparser = argparse.ArgumentParser(description='A JSON-biased alternative to jq')
+argparser.add_argument('command', help='The jason command to run on the JSON')
+argparser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
+argparser.add_argument('--strict', action='store_true', help='Error on missing attributes')
+argparser.add_argument('-U', '--unix', action='store_true', help='Output lists with one line per element and quotes removed around strings')
+argparser.add_argument('-N', '--allow-nulls', action='store_true', help='Allow nulls in output')
 # fmt: on
 
 
@@ -29,7 +31,7 @@ def attr_access(identifier, strict, obj):
 
 
 def entry():
-    args = parser.parse_args()
+    args = argparser.parse_args()
     script = args.command
     filename = args.filename
     strict = args.strict
@@ -42,35 +44,7 @@ def entry():
         with open(filename) as f:
             current_value = json.load(f)
 
-    # Parser
-    array_op = False
-    while script:
-        if script[0:2] == '[]':
-            script = script[2:]
-            array_op = True
-            command = None
-        elif script[0:1] == '.':
-            script = script[1:]
-            identifier = RE_IDENTIFIER.match(script).group(0)
-            script = script[len(identifier) :]
-            command = partial(attr_access, identifier, strict)
-        elif RE_ARRAY_INDEX.match(script):
-            match = RE_ARRAY_INDEX.match(script)
-            index = int(match.group(1))
-            script = script[len(match.group(0)) :]
-            command = lambda arr: arr[index]
-        else:
-            print(f'Unknown command: {script}')
-            exit(0)
-
-        if command:
-            if array_op:
-                current_value = [command(val) for val in current_value]
-                if not allow_nulls:
-                    current_value = [val for val in current_value if val is not None]
-                array_op = False
-            else:
-                current_value = command(current_value)
+    current_value = parser(script, current_value, strict, allow_nulls)
 
     if type(current_value) is list and unix:
         for el in current_value:
