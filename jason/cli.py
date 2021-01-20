@@ -50,12 +50,12 @@ def entry():
         elif script[0:1] == '.':
             script = script[1:]
             identifier = RE_IDENTIFIER.match(script).group(0)
-            script = script[len(identifier):]
+            script = script[len(identifier) :]
             command = partial(attr_access, identifier, strict)
         elif RE_ARRAY_INDEX.match(script):
             match = RE_ARRAY_INDEX.match(script)
             index = int(match.group(1))
-            script = script[len(match.group(0)):]
+            script = script[len(match.group(0)) :]
             command = lambda arr: arr[index]
 
         if command:
