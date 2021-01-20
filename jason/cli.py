@@ -12,16 +12,26 @@ RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
 parser = argparse.ArgumentParser(description='A JSON-biased alternative to jq')
 parser.add_argument('command', help='The jason command to run on the JSON')
 parser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
+parser.add_argument('--strict', action='store_true', help='Error on missing attributes')
 parser.add_argument('-U', '--unix', action='store_true', help='Output lists with one line per element and quotes removed around strings')
 # fmt: on
 
-def attr_access(identifier, obj):
-    return obj[identifier]
+
+def attr_access(identifier, strict, obj):
+    try:
+        return obj[identifier]
+    except KeyError:
+        if strict:
+            raise
+        else:
+            return None
+
 
 def entry():
     args = parser.parse_args()
     script = args.command
     filename = args.filename
+    strict = args.strict
     unix = args.unix
 
     if not sys.stdin.isatty():
@@ -41,7 +51,7 @@ def entry():
             script = script[1:]
             identifier = RE_IDENTIFIER.match(script).group(0)
             script = script[len(identifier):]
-            command = partial(attr_access, identifier)
+            command = partial(attr_access, identifier, strict)
         elif RE_ARRAY_INDEX.match(script):
             match = RE_ARRAY_INDEX.match(script)
             index = int(match.group(1))
