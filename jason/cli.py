@@ -57,6 +57,9 @@ def entry():
             index = int(match.group(1))
             script = script[len(match.group(0)) :]
             command = lambda arr: arr[index]
+        else:
+            print(f'Unknown command: {script}')
+            exit(0)
 
         if command:
             if array_op:
