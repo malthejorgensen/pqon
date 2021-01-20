@@ -14,6 +14,7 @@ parser.add_argument('command', help='The jason command to run on the JSON')
 parser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
 parser.add_argument('--strict', action='store_true', help='Error on missing attributes')
 parser.add_argument('-U', '--unix', action='store_true', help='Output lists with one line per element and quotes removed around strings')
+parser.add_argument('-N', '--allow-nulls', action='store_true', help='Allow nulls in output')
 # fmt: on
 
 
@@ -32,6 +33,7 @@ def entry():
     script = args.command
     filename = args.filename
     strict = args.strict
+    allow_nulls = args.allow_nulls
     unix = args.unix
 
     if not sys.stdin.isatty():
@@ -64,6 +66,8 @@ def entry():
         if command:
             if array_op:
                 current_value = [command(val) for val in current_value]
+                if not allow_nulls:
+                    current_value = [val for val in current_value if val is not None]
                 array_op = False
             else:
                 current_value = command(current_value)
