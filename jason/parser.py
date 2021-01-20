@@ -174,13 +174,14 @@ def parser(script, current_value, strict=True, allow_nulls=False):
             print(f'Unknown command: {script}')
             exit(0)
 
-        if command:
-            if array_op:
-                current_value = [command(val) for val in current_value]
-                if not allow_nulls:
-                    current_value = [val for val in current_value if val is not None]
-                array_op = False
-            else:
-                current_value = command(current_value)
+        if array_op:
+            current_value = [
+                parser(script, val, strict, allow_nulls) for val in current_value
+            ]
+            if not allow_nulls:
+                current_value = [val for val in current_value if val is not None]
+            break
+        elif command:
+            current_value = command(current_value)
 
     return current_value
