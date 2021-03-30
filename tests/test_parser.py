@@ -27,6 +27,24 @@ def test_parse_selector():
     assert getter({'1 2 3': [4, 5, {'def': {'æøå': 789}}]}) == 789
 
 
+def test_parse_array_selector():
+    getter, idx = parse_selector('[2]', strict=True)
+    assert idx == 3
+    assert getter([1, 2, 3, 4, 5]) == 3
+
+    getter, idx = parse_selector('[:3]', strict=True)
+    assert idx == 4
+    assert getter([1, 2, 3, 4, 5]) == [1, 2, 3]
+
+    getter, idx = parse_selector('[1:3]', strict=True)
+    assert idx == 5
+    assert getter([1, 2, 3, 4, 5]) == [2, 3]
+
+    getter, idx = parse_selector('[3:]', strict=True)
+    assert idx == 4
+    assert getter([1, 2, 3, 4, 5]) == [4, 5]
+
+
 def test_parse_literal():
     assert parse_literal('123]') == (123, 3)
     assert parse_literal('"goose duck"]') == ('goose duck', 12)

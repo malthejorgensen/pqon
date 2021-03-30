@@ -5,7 +5,7 @@ import re
 import sys
 
 RE_IDENTIFIER = re.compile(r'^[a-z][a-z0-9_]+', re.IGNORECASE)
-RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
+RE_ARRAY_INDEX = re.compile(r'^\[((\d+:\d+)|(\d+:)|(:\d+)|(\d+))\]')
 
 
 def attr_access(identifier, strict, obj):
@@ -75,13 +75,32 @@ def parse_selector(selector, strict):
             idx += 3
 
             getter = partial(attr_access, identifier, strict)
-        elif re.match(r'\d', selector[1]):
+        elif re.match(r'\d|:', selector[1]):
             # gobble up until ]
-            match = re.match(r'\d+', selector[1:])
-            index = int(match.group(0))
-            idx = 1 + len(match.group(0))
 
-            getter = lambda arr: arr[index]
+            idx = None
+            match = re.match(r'(\d+):(\d+)', selector[1:])
+            if match:
+                idx = 1 + len(match.group(0))
+                begin = int(match.group(1))
+                end = int(match.group(2))
+                getter = lambda arr: arr[begin:end]
+            match = re.match(r':(\d+)', selector[1:])
+            if idx is None and match:
+                idx = 1 + len(match.group(0))
+                until = int(match.group(1))
+                getter = lambda arr: arr[:until]
+            match = re.match(r'(\d+):', selector[1:])
+            if idx is None and match:
+                idx = 1 + len(match.group(0))
+                begin = int(match.group(1))
+                getter = lambda arr: arr[begin:]
+            match = re.match(r'(\d+)', selector[1:])
+            if idx is None:
+                idx = 1 + len(match.group(0))
+                arr_index = int(match.group(1))
+                getter = lambda arr: arr[arr_index]
+
         else:
             parse_error('Expected selector: `"` or digit')
 
@@ -166,10 +185,9 @@ def parser(script, current_value, strict=True, allow_nulls=False):
             command = getter
             script = script[idx:]
         elif RE_ARRAY_INDEX.match(script):
-            match = RE_ARRAY_INDEX.match(script)
-            index = int(match.group(1))
-            script = script[len(match.group(0)) :]
-            command = lambda arr: arr[index]
+            getter, idx = parse_selector(script[0:], strict)
+            command = getter
+            script = script[idx:]
         else:
             print(f'Unknown command: {script}')
             exit(0)
