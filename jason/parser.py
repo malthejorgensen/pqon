@@ -157,7 +157,10 @@ def parser(script, current_value, strict=True, allow_nulls=False):
     # Parser
     array_op = False
     while script:
-        if script[0] == 'F':
+        if script[0] == '|':
+            script = script[1:]
+            command = None
+        elif script[0] == 'F':
             if script[1] != '(':
                 parse_error('Saw F-expression and expected "("')
 

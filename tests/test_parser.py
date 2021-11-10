@@ -86,6 +86,7 @@ def test_parser():
         [12],
         [14, 11, 16],
     ]
-    # assert parser('[].children|F(.personal["number of children"] <= 2)', people2) == [
-    #     people2[0]
-    # ]
+    assert parser('[].personal.children|F(.age > 13)|[].name', people4) == [
+        [],
+        ['Justin', 'Jade'],
+    ]
