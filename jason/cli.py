@@ -50,7 +50,7 @@ def entry():
         for el in current_value:
             print(el)
     else:
-        print(json.dumps(current_value))
+        print(json.dumps(current_value, indent=2))
 
 
 if __name__ == '__main__':
