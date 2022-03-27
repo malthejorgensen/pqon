@@ -1,11 +1,17 @@
 pqon
-=====
+====
 pqon is a more consistent version of jq. The full reasoning behind building an alternative to `jq`
-can be found in this blog post ([https://malthejorgensen.com/blog/<slug>]).
-It takes JSON as input and outputs that JSON.
+can be found an upcoming blog post on my blog <https://blagblogblag.com>.
+It takes JSON as input and outputs the transformed JSON.
 
-Examples
---------
+Install
+-------
+The recommended way to install `pqon` is via [pipx]:
+
+    pipx pqon
+
+Example usage
+-------------
 ```json
 # example.json
 [
@@ -43,11 +49,11 @@ script.
 * Decent error messages
 
 pqon is
---------
+-------
 * Easier to reason about than `jq` (yes, this is subjective)
 
 pqon is _not_
---------------
+-------------
 * Built for speed (uses the built-in `json`-library in Python)
 * Low on memory usage / streaming (parses and stores the full JSON in memory)
 
@@ -142,3 +148,5 @@ occur.
 Thank you
 ---------
 * https://dev.to/bowmanjd/build-and-test-a-command-line-interface-with-poetry-python-s-argparse-and-pytest-4gab
+
+[pipx]: https://github.com/pypa/pipx
