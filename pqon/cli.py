@@ -12,7 +12,7 @@ RE_ARRAY_INDEX = re.compile(r'^\[(\d+)\]')
 
 # fmt: off
 argparser = argparse.ArgumentParser(description='A JSON-biased alternative to jq')
-argparser.add_argument('command', help='The jason command to run on the JSON')
+argparser.add_argument('command', help='The pqon command to run on the JSON')
 argparser.add_argument('filename', nargs='?', metavar='files', help='The files to transform')
 argparser.add_argument('--strict', action='store_true', help='Error on missing attributes')
 argparser.add_argument('-U', '--unix', action='store_true', help='Output lists with one line per element and quotes removed around strings')

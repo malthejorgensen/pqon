@@ -1,4 +1,4 @@
-from jason.parser import gobble_backslashed_str, parse_selector, parse_literal, parser
+from pqon.parser import gobble_backslashed_str, parse_selector, parse_literal, parser
 
 
 def test_gobble_backslashed_str():

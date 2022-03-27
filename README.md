@@ -1,6 +1,6 @@
-jason
+pqon
 =====
-jason is a more consistent version of jq. The full reasoning behind building an alternative to `jq`
+pqon is a more consistent version of jq. The full reasoning behind building an alternative to `jq`
 can be found in this blog post ([https://malthejorgensen.com/blog/<slug>]).
 It takes JSON as input and outputs that JSON.
 
@@ -15,7 +15,7 @@ Examples
 ```
 
 ```bash
-> jason '[].name' example.json
+> pqon '[].name' example.json
 ["Jane Doe", "John Doe"]
 
 > jq '.[].name' example.json
@@ -24,7 +24,7 @@ Examples
 ```
 
 ```bash
-> jason 'F(.age > 50).name' example.json
+> pqon 'F(.age > 50).name' example.json
 [{ "name": "Jane Doe", "age": 55 }]
 
 > jq '.[]|select(.age > 50)' example.json
@@ -42,11 +42,11 @@ script.
 * Always-on approach to JSON (internal represenation is JSON-compatible, and output is always JSON)
 * Decent error messages
 
-jason is
+pqon is
 --------
 * Easier to reason about than `jq` (yes, this is subjective)
 
-jason is _not_
+pqon is _not_
 --------------
 * Built for speed (uses the built-in `json`-library in Python)
 * Low on memory usage / streaming (parses and stores the full JSON in memory)
@@ -59,22 +59,22 @@ jason is _not_
 Does this return the full `example2.json`, or just the collaborators with an age
 above 50?
 ```bash
-> jason '.collaborators[]F(.age > 50)' example2.json
+> pqon '.collaborators[]F(.age > 50)' example2.json
 # Prints only collaborator elements
-> jason 'F(.collaborators.age > 50)' example3.json
+> pqon 'F(.collaborators.age > 50)' example3.json
 # Prints whole top-level object
 ```
 
 Replace strings
 ```bash
-> jason '.collaborators[].name|R("Doe", "Johnson")' example2.json
+> pqon '.collaborators[].name|R("Doe", "Johnson")' example2.json
 ```
 
 ```bash
 # Get the first country in all countries attributes
-> jason '[].countries[0]'
+> pqon '[].countries[0]'
 # Get the value of the "countries"-attribute of the first element in the list
-> jason '([].countries)[0]' == jason '[0].countries'
+> pqon '([].countries)[0]' == pqon '[0].countries'
 ```
 
 Alternative tools
@@ -90,10 +90,10 @@ Alternative tools
 Alternative ideas
 -----------------
 ### Selector / transformer at command line
-jason takes three arguments
+pqon takes three arguments
 
 ```bash
-> jason <selector> <transformers> <file>
+> pqon <selector> <transformers> <file>
 ```
 
 The selector is which part of the JSON structure you want to have output.
@@ -105,16 +105,16 @@ people4 = [
     {"name": "Jane Doe", "personal": {"children": [{'name': 'Jake', 'age': 12}]}},
     {"name": "John Doe", "personal": {"children": [{'name': 'Justin', 'age': 14}, {'name': 'John', 'age': 11}, {'name': 'Jade', 'age': 16}]}},
 ]
-> jason '[].personal.children[].age' '[].personal.children!F(. > 13)' <file>
+> pqon '[].personal.children[].age' '[].personal.children!F(. > 13)' <file>
 [[], [14, 16]]
 or this other syntax where the transform always works on the output of the selector
-> jason '[].personal.children[].age' 'F(. > 13)' <file>
+> pqon '[].personal.children[].age' 'F(. > 13)' <file>
 [[], [14, 16]]
 ```
 
 ### Selector / transformer clearly marked in the language
 
-jason generally has two kinds of operations:
+pqon generally has two kinds of operations:
 
 * Selectors -- always start with a `.`
 * Transformers -- always start with a `!`
@@ -124,12 +124,12 @@ people4 = [
     {"name": "Jane Doe", "personal": {"children": [{'name': 'Jake', 'age': 12}]}},
     {"name": "John Doe", "personal": {"children": [{'name': 'Justin', 'age': 14}, {'name': 'John', 'age': 11}, {'name': 'Jade', 'age': 16}]}},
 ]
-> jason '.[].personal.children.[].age!F(. > 13)' <file>
+> pqon '.[].personal.children.[].age!F(. > 13)' <file>
 [[], [14, 16]]
-> jason '.[].personal.children!F(.age > 13)' <file>
+> pqon '.[].personal.children!F(.age > 13)' <file>
 [[], [{'name': 'Justin', 'age': 14}, {'name': 'Jade', 'age': 16}]]
-# > jason '!F(.personal.children.[].age > 13)' <file>
-> jason '!F(.personal.children!any(.age > 13))' <file>
+# > pqon '!F(.personal.children.[].age > 13)' <file>
+> pqon '!F(.personal.children!any(.age > 13))' <file>
 [{"name": "John Doe", "personal": {"children": [{'name': 'Justin', 'age': 14}, {'name': 'John', 'age': 11}, {'name': 'Jade', 'age': 16}]}}]
 ```
 
