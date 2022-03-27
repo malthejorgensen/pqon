@@ -92,6 +92,7 @@ Alternative tools
 * [fx](https://github.com/antonmedv/fx)
 * [jp]()
 * [jello](https://github.com/kellyjonbrazil/jello)
+* Plain Python: `echo '[123, { "children": ["a", "b", "c"] }]' | python -c 'import json, sys; print(json.load(sys.stdin)[1]["children"])'`
 
 Alternative ideas
 -----------------
