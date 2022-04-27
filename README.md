@@ -90,9 +90,14 @@ Alternative tools
 * [jshon](https://github.com/keenerd/jshon)
 * [jtc](https://github.com/ldn-softdev/jtc)
 * [fx](https://github.com/antonmedv/fx)
-* [jp]()
+* jp - two tools named "jp": https://github.com/cburgmer/jp and https://github.com/brianm/jp
 * [jello](https://github.com/kellyjonbrazil/jello)
+* [pq](https://github.com/dvolk/pq)
 * Plain Python: `echo '[123, { "children": ["a", "b", "c"] }]' | python -c 'import json, sys; print(json.load(sys.stdin)[1]["children"])'`
+
+*Line-based tools*
+- [gron](https://github.com/tomnomnom/gron) (love this idea!)
+- JSONL/JSON lines: https://jsonlines.org/
 
 Alternative ideas
 -----------------
