@@ -12,8 +12,8 @@ The recommended way to install `pqon` is via [pipx]:
 
 Example usage
 -------------
-```json
-# example.json
+```json5
+// example.json
 [
   { "name": "Jane Doe", "age": 55 },
   { "name": "John Doe", "age": 41 }
