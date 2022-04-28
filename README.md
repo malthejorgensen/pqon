@@ -30,12 +30,37 @@ Example usage
 ```
 
 ```bash
-> pqon 'F(.age > 50).name' example.json
+> pqon 'F(.age > 50)' example.json
 [{ "name": "Jane Doe", "age": 55 }]
 
 > jq '.[]|select(.age > 50)' example.json
 { "name": "Jane Doe", "age": 55 }
 ```
+
+```json5
+// example-with-children.json
+[
+  {"name": "Jane Doe", "personal": {"children": [{"name": "Jake", "age": 12}, {"name": "June", "age": 5}]}},
+  {"name": "John Doe", "personal": {"children": [{"name": "Justin", "age": 14}, {"name": "John", "age": 11}, {"name": "Jade", "age": 16}]}}
+]
+```
+
+Sort the `personal.children` sublist but otherwise return all the origin data
+```bash
+> pqon '???' example-with-children.json
+# Perhaps `O(.personal.children, .age)` -- `O` for "order", since "S" is for "select" and thus we can't do `S`/`sort`.
+[
+  {"name": "Jane Doe", "personal": {"children": [{"name": "June", "age": 5}, {"name": "Jake", "age": 12}]}},
+  {"name": "John Doe", "personal": {"children": [{"name": "John", "age": 11}, {"name": "Justin", "age": 14}, {"name": "Jade", "age": 16}]}}
+]
+
+> jq '.[].personal.children |= sort_by(.age)' example-with-children.json
+[
+  {"name": "Jane Doe", "personal": {"children": [{"name": "June", "age": 5}, {"name": "Jake", "age": 12}]}},
+  {"name": "John Doe", "personal": {"children": [{"name": "John", "age": 11}, {"name": "Justin", "age": 14}, {"name": "Jade", "age": 16}]}}
+]
+```
+jq's `|=`-operator is quite difficult to wrap your head around here.
 
 One of the things that has been tripping me up is that jq is command-line biased
 
@@ -122,6 +147,20 @@ people4 = [
 or this other syntax where the transform always works on the output of the selector
 > pqon '[].personal.children[].age' 'F(. > 13)' <file>
 [[], [14, 16]]
+```
+
+### Selector clearly marked in the language
+Currently, there are two operators `F` (filter) and `R` (replace) but the selectors are "bare" and not qualified with any name.
+We could add a selection operation `S`, and disallow "bare" selection:
+
+```bash
+> pqon 'S([].age) | F(. > 50)' example.json
+[55]
+```
+
+```
+> pqon 'F(.age > 50) | S(.personal.children[0])' example-with-children.json
+{'name': 'Jake', 'age': 12}
 ```
 
 ### Selector / transformer clearly marked in the language
