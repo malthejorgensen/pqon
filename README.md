@@ -57,11 +57,6 @@ pqon is _not_
 * Built for speed (uses the built-in `json`-library in Python)
 * Low on memory usage / streaming (parses and stores the full JSON in memory)
 
-
-
-
-
-
 Does this return the full `example2.json`, or just the collaborators with an age
 above 50?
 ```bash
@@ -86,16 +81,21 @@ Replace strings
 Alternative tools
 -----------------
 
-* jq
-* [jshon](https://github.com/keenerd/jshon)
-* [jtc](https://github.com/ldn-softdev/jtc)
-* [fx](https://github.com/antonmedv/fx)
-* jp - two tools named "jp": https://github.com/cburgmer/jp and https://github.com/brianm/jp
-* [jello](https://github.com/kellyjonbrazil/jello)
-* [pq](https://github.com/dvolk/pq)
-* Plain Python: `echo '[123, { "children": ["a", "b", "c"] }]' | python -c 'import json, sys; print(json.load(sys.stdin)[1]["children"])'`
+- [jq](https://stedolan.github.io/jq/) – The "OG"
+- [jshon](https://github.com/keenerd/jshon)
+- [jtc](https://github.com/ldn-softdev/jtc)
+- [fx](https://github.com/antonmedv/fx)
+- jp - two tools named "jp": https://github.com/cburgmer/jp and https://github.com/brianm/jp
+- [pq](https://github.com/dvolk/pq)
+- [zq](https://zed.brimdata.io/docs/commands/zq/) – _I'm not a fan of this one. The "SQL"-like syntax is not an improvement._ ([blog post](https://www.brimdata.io/blog/introducing-zq/) and [Lobste.rs discussion](https://lobste.rs/s/uhkwhn/introducing_zq_easier_faster))
+- Plain Python: `echo '[123, { "children": ["a", "b", "c"] }]' | python -c 'import json, sys; print(json.load(sys.stdin)[1]["children"])'`
 
-*Line-based tools*
+
+**Manipulate JSON with Python/Go/...**
+- [jello](https://github.com/kellyjonbrazil/jello) – Use Python to manipulate JSON. Input data is set to the `_`-variable.
+- [gq](https://github.com/hherman1/gq) – Use Go to manipulate JSON. Input data is set to the `j`-variable. ([Hacker News discussion](https://news.ycombinator.com/item?id=31181898))
+
+**Line-based tools**
 - [gron](https://github.com/tomnomnom/gron) (love this idea!)
 - JSONL/JSON lines: https://jsonlines.org/
 
